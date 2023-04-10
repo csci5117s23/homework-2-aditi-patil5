@@ -3,6 +3,7 @@ import NavBar from '@/components/nav';
 import Item from '@/components/todoItem';
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react';
+import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
 
 function Id(){
     const router = useRouter();
@@ -28,14 +29,18 @@ function Id(){
     },[]);
 
     return <>
-        <NavBar></NavBar>
-        <h1 className={styles.mainTitle}>Item Overview</h1>
-        <div className={styles.mainContainer}>
-            <div>
-                {data && <Item id={id} json={data} router={router}></Item>}
+        <SignedIn>
+            <NavBar signedIn={true}></NavBar>
+            <h1 className={styles.mainTitle}>Item Overview</h1>
+            <div className={styles.mainContainer}>
+                <div>
+                    {data && <Item id={id} json={data} router={router}></Item>}
+                </div>
             </div>
-        </div>
-        
+        </SignedIn>
+        <SignedOut>
+            <SignIn path="/login" routing="path" redirectUrl="/todos"/>
+        </SignedOut>
     </>
 }
 

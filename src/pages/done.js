@@ -3,6 +3,7 @@ import ListItem from "@/components/listitem";
 import NavBar from "@/components/nav";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { SignedIn,SignedOut,SignIn } from '@clerk/clerk-react';
 
  
 function Done(){
@@ -47,19 +48,24 @@ function Done(){
                     
     return (
         <>
-        <NavBar></NavBar>
-        <h1 className={styles.mainTitle}>Done: Completed Items</h1>
-        <div className={styles.mainContainer}>
-            { data && data.map( (item) => {
-                if(item.done){
-                    return <div className={styles.listItem} key={`key-${item._id}`} id={`container-${item._id}`}>
-                    <input type="checkbox" id={`checkbox-${item._id}`} onChange={clickMarkDone} checked></input>
-                    <ListItem id={`item-${item._id}`} key={`key-${item._id}`} name={item.name}  content={item.content}
-                    link={`/done`} router={router}></ListItem>  
-                </div>
-                }
-            })}
-        </div>
+        <SignedIn>
+            <NavBar signedIn={true}></NavBar>
+            <h1 className={styles.mainTitle}>Done: Completed Items</h1>
+            <div className={styles.mainContainer}>
+                { data && data.map( (item) => {
+                    if(item.done){
+                        return <div className={styles.listItem} key={`key-${item._id}`} id={`container-${item._id}`}>
+                        <input type="checkbox" id={`checkbox-${item._id}`} onChange={clickMarkDone} checked></input>
+                        <ListItem id={`item-${item._id}`} key={`key-${item._id}`} name={item.name}  content={item.content}
+                        link={`/done`} router={router}></ListItem>  
+                    </div>
+                    }
+                })}
+            </div>
+        </SignedIn>
+        <SignedOut>
+            <SignIn path="/login" routing="path" redirectUrl="/done"/>;
+        </SignedOut>
         </>
     )
 }

@@ -4,6 +4,7 @@ import ListItem from "@/components/listitem";
 import NavBar from "@/components/nav";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
 
  
 function Todos(){
@@ -83,23 +84,28 @@ function Todos(){
 
     return (
         <>
-        <NavBar></NavBar>
-        <h1 className={styles.mainTitle}>Todo Page</h1>
-        <div className={styles.mainContainer}>
-            <button onClick={toggleForm} className='pure-button pure-button-primary'>Add +</button>
-            { isFormDisplayed && <AddItemForm onSubmit={onSubmitAddForm}></AddItemForm>}
-            <div>
-                { data && data.map( (item) => {
-                    if(!item.done){
-                        return <div className={styles.listItem} key={`key-${item._id}`} id={`container-${item._id}`}>
-                            <input type="checkbox" id={`checkbox-${item._id}`} onChange={clickMarkDone}></input>
-                            <ListItem name={item.name} id={`listItem-${item._id}`} content={item.content}
-                            router={router} onClick={onClickNavigateToItem}></ListItem>
-                        </div>
-                    }
-                })}
+        <SignedIn>
+            <NavBar signedIn={true}></NavBar>
+            <h1 className={styles.mainTitle}>Todo Page</h1>
+            <div className={styles.mainContainer}>
+                <button onClick={toggleForm} className='pure-button pure-button-primary'>Add +</button>
+                { isFormDisplayed && <AddItemForm onSubmit={onSubmitAddForm}></AddItemForm>}
+                <div>
+                    { data && data.map( (item) => {
+                        if(!item.done){
+                            return <div className={styles.listItem} key={`key-${item._id}`} id={`container-${item._id}`}>
+                                <input type="checkbox" id={`checkbox-${item._id}`} onChange={clickMarkDone}></input>
+                                <ListItem name={item.name} id={`listItem-${item._id}`} content={item.content}
+                                router={router} onClick={onClickNavigateToItem}></ListItem>
+                            </div>
+                        }
+                    })}
+                </div>
             </div>
-        </div>
+        </SignedIn>
+        <SignedOut>
+            <SignIn path="/login" routing="path" redirectUrl="/todos"/>;
+        </SignedOut>
         </>
       )
 }
