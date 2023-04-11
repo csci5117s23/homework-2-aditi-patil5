@@ -1,18 +1,19 @@
-import styles from '@/styles/Home.module.css'
+import styles from '@/styles/Home.module.css';
 import ListItem from "@/components/listitem";
 import NavBar from "@/components/nav";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { SignedIn,SignedOut,SignIn } from '@clerk/clerk-react';
+import { SignedIn,SignedOut,SignIn,useAuth } from '@clerk/clerk-react';
 
  
 function Done(){
     const router = useRouter();
     const [data , setData] = useState(null);
+    const { isLoaded, userId, sessionId, getToken } = useAuth();
     useEffect(()=>{
         console.log("Fetching Done data")
         // Fetch data 
-        fetch(process.env.NEXT_PUBLIC_API_ENDPOINT+`/item`, {
+        fetch(process.env.NEXT_PUBLIC_API_ENDPOINT+`/item?userId=${userId}`, {
             method:"GET",
             headers: {
                 'x-apikey': process.env.NEXT_PUBLIC_API_KEY,
@@ -22,7 +23,7 @@ function Done(){
         .then(json =>{
             setData(json);
         });
-    },[]);
+    },[isLoaded]);
 
     function clickMarkDone(e){
         if(confirm("Are you sure you want to mark the item as To-Do?")=== true){
@@ -64,7 +65,11 @@ function Done(){
             </div>
         </SignedIn>
         <SignedOut>
-            <SignIn path="/login" routing="path" redirectUrl="/done"/>;
+            <div className={styles.signInContainer}>
+                <div className={styles.signInChild}>
+                    <SignIn redirectUrl="/done"/>
+                </div>
+            </div>
         </SignedOut>
         </>
     )

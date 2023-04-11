@@ -30,7 +30,7 @@ export default function Home() {
                         <p>Login to start creating and viewing your todo list</p>    
                     </div>
                     <div className="pure-u-1-8">
-                        <button onClick={handleSignIn} className='pure-button pure-button-primary'>Login</button>
+                        <button onClick={handleSignIn} className={`pure-button pure-button-primary`}>Login</button>
                     </div>
                     
                 </div>

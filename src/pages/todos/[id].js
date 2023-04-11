@@ -39,7 +39,11 @@ function Id(){
             </div>
         </SignedIn>
         <SignedOut>
-            <SignIn path="/login" routing="path" redirectUrl="/todos"/>
+            <div className={styles.signInContainer}>
+                <div className={styles.signInChild}>
+                    <SignIn redirectUrl={`/todos/${id}`}/>
+                </div>
+            </div>   
         </SignedOut>
     </>
 }

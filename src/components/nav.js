@@ -10,7 +10,9 @@ export default function NavBar(props){
             <Link className={styles.navItem} href={"/"}> Home</Link>
             <Link className={styles.navItem} href={"/todos"}>Todos</Link>
             <Link className={styles.navItem} href={"/done"}> Done</Link>
-            { signedIn.current && <UserButton></UserButton>}
+            { signedIn.current && <div className={styles.navItem}>
+                    <UserButton></UserButton>
+                </div>}
         </div>
     </>
 }

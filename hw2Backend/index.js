@@ -9,6 +9,7 @@ import { date, object, string, boolean } from 'yup'
 
 const todoItem = object({ // json data validation
     content: string().required(),
+    userId: string().required(),
     done: boolean().default(()=> false),
     category: string().default(),
     createdOn: date().default(() => new Date()),

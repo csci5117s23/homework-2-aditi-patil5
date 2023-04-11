@@ -4,30 +4,34 @@ import ListItem from "@/components/listitem";
 import NavBar from "@/components/nav";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
+import { SignIn, SignedIn, SignedOut, useAuth } from '@clerk/nextjs';
+import jwtDecode from 'jwt-decode';
 
  
 function Todos(){
     const router = useRouter();
     const [isFormDisplayed, setFormDisplayed] = useState(false);
     const [data , setData] = useState(null);
+    const { isLoaded, userId, sessionId, getToken } = useAuth();
 
     useEffect(()=>{
         console.log("Fetching Todo data")
-        fetch(process.env.NEXT_PUBLIC_API_ENDPOINT+`/item`, {
-            method:"GET",
-            headers: {
-                'x-apikey': process.env.NEXT_PUBLIC_API_KEY,
-                'Content-Type': 'application/json', 
-            }
-        }).then(response => response.json()
-        ).then(json =>{
-            setData(json);
-        }).catch((error) => {
-            console.log("Error while retrieving page")
-            router.replace("/404")
-        });
-    },[]);
+        if(userId){
+            fetch(process.env.NEXT_PUBLIC_API_ENDPOINT+`/item?userId=${userId}`, {
+                method:"GET",
+                headers: {
+                    'x-apikey': process.env.NEXT_PUBLIC_API_KEY,
+                    'Content-Type': 'application/json', 
+                }
+            }).then(response => response.json()
+            ).then(json =>{
+                setData(json);
+            }).catch((error) => {
+                console.log("Error while retrieving page")
+                router.replace("/404")
+            });
+        }
+    },[isLoaded]);
 
     function toggleForm(){
         (isFormDisplayed) ? setFormDisplayed(false) : setFormDisplayed(true);
@@ -63,23 +67,26 @@ function Todos(){
 
     function onSubmitAddForm(e){
         e.preventDefault();
+        
         const content = e.target.content.value;
-        console.log("Submiting form: " + e.target.content.value);
-        fetch(process.env.NEXT_PUBLIC_API_ENDPOINT+`/item`, {
-            method:"POST",
-            headers: {
-                'x-apikey': process.env.NEXT_PUBLIC_API_KEY,
-                'Content-Type': 'application/json', 
-            },
-            body: JSON.stringify({
-                content: content
-            })
-        }).then(response => response.json())
-        .then(json =>{
-            // add element to data
-            setData(prevArray => [json, ...prevArray])
-            setFormDisplayed(value => !value);
-        }); 
+        if(userId){
+            fetch(process.env.NEXT_PUBLIC_API_ENDPOINT+`/item`, {
+                method:"POST",
+                headers: {
+                    'x-apikey': process.env.NEXT_PUBLIC_API_KEY,
+                    'Content-Type': 'application/json', 
+                },
+                body: JSON.stringify({
+                    content: content,
+                    userId: userId
+                })
+            }).then(response => response.json())
+            .then(json =>{
+                // add element to data
+                setData(prevArray => [json, ...prevArray])
+                setFormDisplayed(value => !value);
+            }); 
+        }
     }
 
     return (
@@ -104,7 +111,11 @@ function Todos(){
             </div>
         </SignedIn>
         <SignedOut>
-            <SignIn path="/login" routing="path" redirectUrl="/todos"/>;
+            <div className={styles.signInContainer}>
+                <div className={styles.signInChild}>
+                    <SignIn redirectUrl="/todos"/>
+                </div>
+            </div>
         </SignedOut>
         </>
       )
